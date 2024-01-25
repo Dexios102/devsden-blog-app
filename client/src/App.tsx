@@ -1,8 +1,25 @@
+import { Routes, Route } from "react-router-dom";
+import {
+  Home,
+  Dashboard,
+  Login,
+  Register,
+  About,
+  Projects,
+  NotFound,
+} from "./pages";
+
 function App() {
   return (
-    <>
-      <h1>App</h1>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/projects" element={<Projects />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

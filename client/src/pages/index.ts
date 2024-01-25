@@ -4,5 +4,6 @@ import Home from "./Home";
 import Projects from "./Projects";
 import Dashboard from "./Dashboard";
 import About from "./About";
+import NotFound from "./NotFound";
 
-export default { Login, Register, Home, Projects, Dashboard, About };
+export { Login, Register, Home, Projects, Dashboard, About, NotFound };
