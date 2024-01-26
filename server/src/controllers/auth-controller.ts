@@ -9,7 +9,7 @@ export const userSignUp = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, email, password, confirmPassword }: any = req.body;
+  const { username, email, password, confirmPassword }: any = req.body;
   try {
     const userExisted = await User.findOne({ email: email });
     if (userExisted) {
@@ -28,7 +28,7 @@ export const userSignUp = async (
     const hashedPassword: any = await bcrypt.hash(password, saltRounds);
     if (hashedPassword) {
       const user = new User({
-        name: name,
+        username: username,
         email: email,
         password: hashedPassword,
         created_at: new Date(),
@@ -52,7 +52,7 @@ export const userSignUp = async (
         signed: true,
       });
       return res.status(201).json({
-        name: user.username,
+        username: user.username,
         email: user.email,
         msg: "User created successfully",
         status: 201,
@@ -110,7 +110,7 @@ export const userSignIn = async (
 
     return res.status(200).json({
       userId: user._id.toString(),
-      name: user.username,
+      username: user.username,
       email: user.email,
       msg: "User logged in successfully",
       status: 200,
@@ -146,7 +146,7 @@ export const verifyUser = async (
     }
     return res.status(200).json({
       userId: user._id.toString(),
-      name: user.username,
+      username: user.username,
       email: user.email,
       msg: "User verified successfully",
       status: 200,

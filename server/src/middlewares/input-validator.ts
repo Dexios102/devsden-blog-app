@@ -27,6 +27,6 @@ export const loginValidator = [
 ];
 
 export const signupValidator = [
-  body("name").notEmpty().withMessage("Name is required"),
+  body("username").notEmpty().withMessage("Username is required"),
   ...loginValidator,
 ];
