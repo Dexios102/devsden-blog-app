@@ -4,6 +4,8 @@ import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
 
+import routes from "./routes";
+
 const app = express();
 
 /* CORS Option */
@@ -19,6 +21,7 @@ app
   .use(cors(corsOptions))
   .use(cookieParser(process.env.COOKIE_SECRET))
   .use(helmet())
-  .use(morgan("dev"));
+  .use(morgan("dev"))
+  .use("/api/beta/", routes);
 
 export default app;
