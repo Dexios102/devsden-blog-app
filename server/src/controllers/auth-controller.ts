@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../middlewares/verify-token";
 import { COOKIE_NAME } from "../utils/constants";
 
+import { errorHandler } from "../middlewares/error-handler";
+
 export const userSignUp = async (
   req: Request,
   res: Response,
@@ -59,12 +61,7 @@ export const userSignUp = async (
       });
     }
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({
-      msg: "Internal Server Error",
-      error: error.message,
-      status: 500,
-    });
+    errorHandler(error, req, res, next);
   }
 };
 
