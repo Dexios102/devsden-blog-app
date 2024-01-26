@@ -9,6 +9,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        none: "bg-transparent",
+        noneLine:
+          "bg-transparent hover:underline hover:underline-offset-4 text-medium hover:scale-110 transition duration-200 ease-in-out",
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
