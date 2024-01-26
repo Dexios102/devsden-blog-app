@@ -13,7 +13,9 @@ import {
 const Layout = () => {
   return (
     <div className="layout">
-      <Navbar />
+      <div className="sticky top-0 z-50">
+        <Navbar />
+      </div>
       <main className="content">
         <Routes>
           <Route path="/" element={<Home />} />

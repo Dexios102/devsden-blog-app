@@ -10,17 +10,19 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navbar = () => {
-  const loggedIn = true;
+  const loggedIn = false;
   return (
     <nav className="flex justify-between items-center">
-      <Link to="/">
-        <button className="flex items-center gap-2 w-full">
-          <img src={devlogo} alt="dev_logo" className="w-10" />
-          <h1 className="text-2xl font-bold gradient-text">DevsDen</h1>
-        </button>
-      </Link>
+      <div className="">
+        <Link to="/">
+          <button className="flex items-center gap-2">
+            <img src={devlogo} alt="dev_logo" className="w-10" />
+            <h1 className="text-2xl font-bold gradient-text">DevsDen</h1>
+          </button>
+        </Link>
+      </div>
       <div
-        className="md:flex gap-6 font-medium 
+        className="md:flex gap-4 font-medium 
         bg-gray-100 mx-2
        rounded-full px-2 dark:bg-gray-900 hidden"
       >
