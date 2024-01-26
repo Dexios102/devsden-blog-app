@@ -1,5 +1,10 @@
 import devlogo from "@/assets/dev.svg";
-import { FaGoogle } from "react-icons/fa";
+import google from "@/assets/google.svg";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { CiMail } from "react-icons/ci";
+import { MdOutlinePassword } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
+import { IoSend } from "react-icons/io5";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -41,23 +46,30 @@ const Register = () => {
   return (
     <div
       className="flex flex-col items-center justify-center md:flex-row
-     gap-4 h-full pt-40"
+     gap-4 h-full pt-32"
     >
       <div className="basis-1/4 hidden md:block">
         <img src={devlogo} alt="dev_logo" className="w-10" />
       </div>
       <div className="w-full max-w-md rounded-md px-6 py-10">
+        <h1 className="mb-4 border-l-4 border-[var(--red-color)] pl-4">
+          Create an account
+        </h1>
+        <hr className="mb-4" />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} />
-                  </FormControl>
+                  <div className="relative">
+                    <FaRegCircleUser className="input-icon" />
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                  </div>
                   <FormDescription>
                     This is your public display name.
                   </FormDescription>
@@ -71,9 +83,12 @@ const Register = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="user@example.com" {...field} />
-                  </FormControl>
+                  <div className="relative">
+                    <CiMail className="input-icon" />
+                    <FormControl>
+                      <Input placeholder="user@example.com" {...field} />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -84,12 +99,12 @@ const Register = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input placeholder="*********" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Must be at least 6 characters.
-                  </FormDescription>
+                  <div className="relative">
+                    <MdOutlinePassword className="input-icon" />
+                    <FormControl>
+                      <Input placeholder="*********" {...field} />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -99,10 +114,13 @@ const Register = () => {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confrim Password</FormLabel>
-                  <FormControl>
-                    <Input placeholder="*********" {...field} />
-                  </FormControl>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <div className="relative">
+                    <RiLockPasswordFill className="input-icon" />
+                    <FormControl>
+                      <Input placeholder="*********" {...field} />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -117,18 +135,19 @@ const Register = () => {
                 Accept terms and conditions
               </label>
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full gradient-bg-button">
               Sign Up
+              <IoSend className="w-5 h-5 ml-2" />
             </Button>
             <Button variant="outline" className="w-full">
-              <FaGoogle className="w-5 h-5 mr-2" />
+              <img src={google} alt="google_icon" className="w-5 mr-2" />
               Continue with Google
             </Button>
           </form>
           <div className="mt-6 text-sm text-muted-foreground text-center">
             Already have an account?{" "}
             <Link to="/login" className="text-brand hover:underline">
-              Log in
+              <span className="text-[var(--blue-color)]">Login</span>
             </Link>
           </div>
         </Form>

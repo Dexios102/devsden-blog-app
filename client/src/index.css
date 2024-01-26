@@ -33,6 +33,10 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --blue-color: #25b6d2;
+    --middle-color: #415e72;
+    --red-color: #e04f5f;
   }
 
   .dark {
@@ -73,8 +77,20 @@
   body {
     @apply bg-background text-foreground mx-12;
   }
+  h1 {
+    @apply text-2xl font-medium;
+  }
   .gradient-text {
     @apply bg-gradient-to-r from-[#25b6d2] via-[#415e72]
      to-[#e04f5f] text-transparent bg-clip-text;
+  }
+  .gradient-bg-button {
+    @apply bg-gradient-to-r from-[#e04f5f] via-[#25b6d2]
+    to-[#415e72] hover:bg-gradient-to-l hover:outline outline-gray-200
+     dark:hover:outline-gray-600 hover:transition-all duration-300;
+  }
+  .input-icon {
+    @apply w-5 h-5 absolute right-3 top-1/2
+    -translate-y-1/2 text-gray-400 dark:text-gray-500;
   }
 }
