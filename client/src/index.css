@@ -71,7 +71,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground my-4 mx-12;
+    @apply bg-background text-foreground mx-12;
   }
   .gradient-text {
     @apply bg-gradient-to-r from-[#25b6d2] via-[#415e72]

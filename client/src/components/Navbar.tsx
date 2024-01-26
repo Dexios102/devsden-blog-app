@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   const loggedIn = false;
   return (
-    <nav className="flex justify-between items-center">
+    <nav className="flex justify-between items-center pt-6">
       <div className="">
         <Link to="/">
           <button className="flex items-center gap-2">
