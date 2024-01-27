@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
@@ -34,6 +35,7 @@ const formSchema = z.object({
 });
 
 const Register = () => {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,9 +52,15 @@ const Register = () => {
       const res = await axios.post("/auth/signup", values);
       if (res.data) {
         console.log(res.data);
+        toast({
+          title: "Account created",
+          description: "Your account has been created successfully.",
+          action: <Link to="/login">Login</Link>,
+        });
       }
     } catch (error) {
       console.log(error);
+      toast({ title: "Error", description: "Something went wrong" });
     } finally {
       setLoading(false);
     }

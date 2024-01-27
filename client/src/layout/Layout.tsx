@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 import {
   Home,
   Dashboard,
@@ -27,6 +28,7 @@ const Layout = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <Toaster />
     </div>
   );
 };
