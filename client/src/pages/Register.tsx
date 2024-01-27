@@ -1,5 +1,6 @@
 import devlogo from "@/assets/dev.svg";
 import google from "@/assets/google.svg";
+import axios from "axios";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { CiMail } from "react-icons/ci";
 import { MdOutlinePassword } from "react-icons/md";
@@ -40,8 +41,16 @@ const Register = () => {
       confirmPassword: "",
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      if (values.password !== values.confirmPassword) {
+        return;
+      }
+      const res = await axios.post("/auth/signup", values);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
   }
   return (
     <div
