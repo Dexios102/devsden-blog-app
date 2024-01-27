@@ -1,3 +1,4 @@
+import { useState } from "react";
 import devlogo from "@/assets/dev.svg";
 import google from "@/assets/google.svg";
 import axios from "axios";
@@ -11,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
+import { AiOutlineLoading } from "react-icons/ai";
 import {
   Form,
   FormControl,
@@ -32,6 +34,7 @@ const formSchema = z.object({
 });
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,14 +45,16 @@ const Register = () => {
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
     try {
-      if (values.password !== values.confirmPassword) {
-        return;
-      }
       const res = await axios.post("/auth/signup", values);
-      console.log(res);
+      if (res.data) {
+        console.log(res.data);
+      }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
   return (
@@ -111,7 +116,11 @@ const Register = () => {
                   <div className="relative">
                     <MdOutlinePassword className="input-icon" />
                     <FormControl>
-                      <Input placeholder="*********" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="*********"
+                        {...field}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -127,7 +136,11 @@ const Register = () => {
                   <div className="relative">
                     <RiLockPasswordFill className="input-icon" />
                     <FormControl>
-                      <Input placeholder="*********" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="*********"
+                        {...field}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -144,9 +157,19 @@ const Register = () => {
                 Accept terms and conditions
               </label>
             </div>
-            <Button type="submit" className="w-full gradient-bg-button">
-              Sign Up
-              <IoSend className="w-5 h-5 ml-2" />
+            <Button
+              type="submit"
+              className="w-full gradient-bg-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <AiOutlineLoading className="w-5 h-5 mr-2 animate-spin" />
+              ) : (
+                <span className="flex items-center">
+                  Sign Up
+                  <IoSend className="w-5 h-5 ml-2" />
+                </span>
+              )}
             </Button>
             <Button variant="outline" className="w-full">
               <img src={google} alt="google_icon" className="w-5 mr-2" />
