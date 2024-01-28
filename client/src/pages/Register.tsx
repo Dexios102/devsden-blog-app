@@ -1,18 +1,25 @@
+/* Packages */
 import { useState } from "react";
-import devlogo from "@/assets/dev.svg";
-import google from "@/assets/google.svg";
+import { useForm } from "react-hook-form";
 import axios from "axios";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+
+/* Icons */
 import { FaRegCircleUser } from "react-icons/fa6";
 import { CiMail } from "react-icons/ci";
 import { MdOutlinePassword } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
 import { AiOutlineLoading } from "react-icons/ai";
+
+/* Assets */
+import devlogo from "@/assets/dev.svg";
+import google from "@/assets/google.svg";
+
+/* UI Components */
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -24,7 +31,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
@@ -59,7 +65,7 @@ const Register = () => {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast({ title: "Error", description: "Something went wrong" });
     } finally {
       setLoading(false);
