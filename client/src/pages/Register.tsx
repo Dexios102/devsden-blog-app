@@ -1,7 +1,7 @@
 /* Packages */
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
@@ -60,17 +60,27 @@ const Register = () => {
         console.log(res.data);
         toast({
           title: "Account created",
-          description: "Your account has been created successfully.",
+          description: `${res.data.username} account has been created successfully.`,
           action: <Link to="/login">Login</Link>,
         });
       }
-    } catch (error) {
-      console.error(error);
-      toast({ title: "Error", description: "Something went wrong" });
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error(error);
+        if (error.response && error.response.data && error.response.data.msg) {
+          toast({ title: "Error", description: error.response.data.msg });
+        } else {
+          toast({
+            title: "Error",
+            description: "Something went wrong, try again",
+          });
+        }
+      }
     } finally {
       setLoading(false);
     }
   }
+
   return (
     <div
       className="flex flex-col items-center justify-center md:flex-row
@@ -162,7 +172,7 @@ const Register = () => {
               )}
             />
             <div className="flex items-center space-x-2">
-              <Checkbox id="terms" />
+              <Checkbox id="terms" required />
               <label
                 htmlFor="terms"
                 className="text-sm font-medium leading-none
