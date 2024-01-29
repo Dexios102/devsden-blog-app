@@ -1,9 +1,16 @@
-import { useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+/* Redux */
+import type { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+} from "@/redux/user/user-slice";
 /* Assets */
 import devlogo from "@/assets/dev.svg";
 import google from "@/assets/google.svg";
@@ -32,8 +39,9 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const loading = useSelector((state: RootState) => state.user.loading);
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,11 +50,11 @@ const Login = () => {
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
+    dispatch(loginStart());
     try {
       const res = await axios.post("/auth/signin", values);
-      console.log(res.data);
       if (res.data) {
+        dispatch(loginSuccess(res.data));
         toast({
           title: "Login Successful",
           description: `Welcome back ${res.data.username}`,
@@ -54,8 +62,8 @@ const Login = () => {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        console.error(error.message);
         if (error.response && error.response.data && error.response.data.msg) {
+          dispatch(loginFailure(error.response.data.msg));
           toast({ title: "Error", description: error.response.data.msg });
         } else {
           toast({
@@ -64,8 +72,6 @@ const Login = () => {
           });
         }
       }
-    } finally {
-      setLoading(false);
     }
   }
   return (
@@ -108,7 +114,11 @@ const Login = () => {
                   <div className="relative">
                     <MdOutlinePassword className="input-icon" />
                     <FormControl>
-                      <Input placeholder="*********" {...field} />
+                      <Input
+                        placeholder="*********"
+                        type="password"
+                        {...field}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
