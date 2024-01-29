@@ -5,7 +5,6 @@ import axios, { AxiosError } from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-
 /* Icons */
 import { FaRegCircleUser } from "react-icons/fa6";
 import { CiMail } from "react-icons/ci";
@@ -13,11 +12,9 @@ import { MdOutlinePassword } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
 import { AiOutlineLoading } from "react-icons/ai";
-
 /* Assets */
 import devlogo from "@/assets/dev.svg";
 import google from "@/assets/google.svg";
-
 /* UI Components */
 import { Button } from "@/components/ui/button";
 import {

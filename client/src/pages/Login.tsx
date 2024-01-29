@@ -1,12 +1,18 @@
-import devlogo from "@/assets/dev.svg";
-import google from "@/assets/google.svg";
-import { CiMail } from "react-icons/ci";
-import { MdOutlinePassword } from "react-icons/md";
-import { IoSend } from "react-icons/io5";
+import { useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
+import { Link } from "react-router-dom";
+import axios, { AxiosError } from "axios";
+/* Assets */
+import devlogo from "@/assets/dev.svg";
+import google from "@/assets/google.svg";
+/* Icons */
+import { CiMail } from "react-icons/ci";
+import { MdOutlinePassword } from "react-icons/md";
+import { IoSend } from "react-icons/io5";
+import { AiOutlineLoading } from "react-icons/ai";
+/* UI Components */
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,14 +24,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6).max(50),
+  password: z.string(),
 });
 
 const Login = () => {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,8 +41,32 @@ const Login = () => {
       password: "",
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    try {
+      const res = await axios.post("/auth/signin", values);
+      console.log(res.data);
+      if (res.data) {
+        toast({
+          title: "Login Successful",
+          description: `Welcome back ${res.data.username}`,
+        });
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error(error.message);
+        if (error.response && error.response.data && error.response.data.msg) {
+          toast({ title: "Error", description: error.response.data.msg });
+        } else {
+          toast({
+            title: "Error",
+            description: "Something went wrong, try again",
+          });
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div
@@ -105,9 +137,19 @@ const Login = () => {
                 </Link>
               </div>
             </div>
-            <Button type="submit" className="w-full gradient-bg-button">
-              Sign In
-              <IoSend className="w-5 h-5 ml-2" />
+            <Button
+              type="submit"
+              className="w-full gradient-bg-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <AiOutlineLoading className="w-5 h-5 mr-2 animate-spin" />
+              ) : (
+                <span className="flex items-center">
+                  Sign In
+                  <IoSend className="w-5 h-5 ml-2" />
+                </span>
+              )}
             </Button>
             <Button variant="outline" className="w-full">
               <img src={google} alt="google_icon" className="w-5 mr-2" />
