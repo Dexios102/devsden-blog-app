@@ -15,7 +15,7 @@ import { verifyToken } from "../middlewares/verify-token";
 
 const authRoutes = Router();
 
-authRoutes.get("/google", googleAuth);
+authRoutes.post("/google", googleAuth);
 authRoutes.post("/signup", validate(signupValidator), userSignUp);
 authRoutes.post("/signin", validate(loginValidator), userSignIn);
 authRoutes.get("/auth-status", verifyToken, verifyUser);
