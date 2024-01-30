@@ -6,6 +6,57 @@ import { COOKIE_NAME } from "../utils/constants";
 
 import { errorHandler } from "../middlewares/error-handler";
 
+export const googleAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { name, email, googleImg }: any = req.body;
+  try {
+    let user = await User.findOne({ email });
+    if (!user) {
+      const generatePassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(generatePassword, 10);
+      user = new User({
+        username:
+          name.toLowerCase().split(" ").join("_") +
+          Math.random().toString(9).slice(-5),
+        email,
+        password: hashedPassword,
+        profilePic: googleImg,
+        created_at: new Date(),
+      });
+      await user.save();
+    }
+    const token = generateToken(user._id.toString(), user.email, "1d");
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 1);
+
+    res.clearCookie(COOKIE_NAME, {
+      httpOnly: true,
+      path: "/",
+      domain: "localhost",
+      signed: true,
+    });
+
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      path: "/",
+      domain: "localhost",
+      expires,
+      signed: true,
+    });
+
+    res.status(200).json({
+      msg: "Login Successful",
+      status: 200,
+      data: user,
+    });
+  } catch (error: any) {
+    errorHandler(error, req, res, next);
+  }
+};
+
 export const userSignUp = async (
   req: Request,
   res: Response,
