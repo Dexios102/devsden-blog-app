@@ -13,7 +13,6 @@ import {
 } from "@/redux/user/user-slice";
 /* Assets */
 import devlogo from "@/assets/dev.svg";
-import google from "@/assets/google.svg";
 /* Icons */
 import { CiMail } from "react-icons/ci";
 import { MdOutlinePassword } from "react-icons/md";
@@ -32,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+import Oauth from "@/components/Oauth";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -161,10 +161,7 @@ const Login = () => {
                 </span>
               )}
             </Button>
-            <Button variant="outline" className="w-full">
-              <img src={google} alt="google_icon" className="w-5 mr-2" />
-              Continue with Google
-            </Button>
+            <Oauth />
           </form>
           <div className="mt-6 text-sm text-muted-foreground text-center">
             Don't have an account?{" "}

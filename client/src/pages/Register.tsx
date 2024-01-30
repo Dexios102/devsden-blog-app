@@ -14,7 +14,6 @@ import { IoSend } from "react-icons/io5";
 import { AiOutlineLoading } from "react-icons/ai";
 /* Assets */
 import devlogo from "@/assets/dev.svg";
-import google from "@/assets/google.svg";
 /* UI Components */
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+import Oauth from "@/components/Oauth";
 
 const formSchema = z.object({
   username: z.string().min(2).max(50),
@@ -192,10 +192,7 @@ const Register = () => {
                 </span>
               )}
             </Button>
-            <Button variant="outline" className="w-full">
-              <img src={google} alt="google_icon" className="w-5 mr-2" />
-              Continue with Google
-            </Button>
+            <Oauth />
           </form>
           <div className="mt-6 text-sm text-muted-foreground text-center">
             Already have an account?{" "}
