@@ -1,19 +1,24 @@
-import devlogo from "@/assets/dev.svg";
-import ModeToggle from "./theme/mode-toggle";
-import me from "../assets/me.jpg";
-import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
-import { CgLogIn } from "react-icons/cg";
-import { CiSearch } from "react-icons/ci";
+/* Redux */
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+/* UI Components */
+import ModeToggle from "./theme/mode-toggle";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+/* Assets */
+import devlogo from "@/assets/dev.svg";
+/* Icons */
+import { CgLogIn } from "react-icons/cg";
+import { CiSearch } from "react-icons/ci";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 const Navbar = () => {
-  const loggedIn = false;
+  const { userNow } = useSelector((state: RootState) => state.user);
   return (
     <nav className="flex justify-between items-center pt-6">
-      <div className="">
+      <div className="mr-4">
         <Link to="/">
           <button className="flex items-center gap-2">
             <img src={devlogo} alt="dev_logo" className="w-10" />
@@ -21,22 +26,22 @@ const Navbar = () => {
           </button>
         </Link>
       </div>
-      <div
-        className="md:flex gap-4 font-medium 
-        bg-gray-100 mx-2
-       rounded-full px-2 dark:bg-gray-900 hidden"
-      >
-        <Link to="/">
-          <Button variant="noneLine">Home</Button>
-        </Link>
-        <Link to="/about">
-          <Button variant="noneLine">About</Button>
-        </Link>
-        <Link to="/projects">
-          <Button variant="noneLine">Projects</Button>
-        </Link>
-      </div>
       <div className="flex items-center md:gap-4">
+        <div
+          className="md:flex gap-4 font-medium 
+        bg-gray-100 mx-2
+       rounded-md px-2 dark:bg-gray-900 hidden"
+        >
+          <Link to="/">
+            <Button variant="noneLine">Home</Button>
+          </Link>
+          <Link to="/about">
+            <Button variant="noneLine">About</Button>
+          </Link>
+          <Link to="/projects">
+            <Button variant="noneLine">Projects</Button>
+          </Link>
+        </div>
         <div className="w-full max-w-sm relative hidden md:block">
           <Input placeholder="Search" type="text" />
           <CiSearch
@@ -47,11 +52,11 @@ const Navbar = () => {
         <div>
           <ModeToggle />
         </div>
-        {loggedIn ? (
+        {userNow ? (
           <div className="hidden md:block">
             <Link to="/profile">
               <Avatar>
-                <AvatarImage src={me} />
+                <AvatarImage src={userNow.profilePic} />
                 <AvatarFallback>DD</AvatarFallback>
               </Avatar>
             </Link>
