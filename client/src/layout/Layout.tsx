@@ -10,6 +10,7 @@ import {
   Projects,
   NotFound,
 } from "../pages";
+import PrivateRoute from "@/components/PrivateRoute";
 
 const Layout = () => {
   return (
@@ -20,9 +21,11 @@ const Layout = () => {
       <main className="content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="*" element={<NotFound />} />
