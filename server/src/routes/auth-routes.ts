@@ -19,6 +19,6 @@ authRoutes.post("/google", googleAuth);
 authRoutes.post("/signup", validate(signupValidator), userSignUp);
 authRoutes.post("/signin", validate(loginValidator), userSignIn);
 authRoutes.get("/auth-status", verifyToken, verifyUser);
-authRoutes.get("/signout", verifyToken, userSignOut);
+authRoutes.post("/signout", verifyToken, userSignOut);
 
 export default authRoutes;
