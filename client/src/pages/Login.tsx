@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+import { useNavigate } from "react-router-dom";
 /* Redux */
 import type { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +13,7 @@ import {
   loginFailure,
 } from "@/redux/user/user-slice";
 /* Assets */
-import devlogo from "@/assets/dev.svg";
+import developer from "@/assets/developer.svg";
 /* Icons */
 import { CiMail } from "react-icons/ci";
 import { MdOutlinePassword } from "react-icons/md";
@@ -42,6 +43,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.user.loading);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,6 +61,7 @@ const Login = () => {
           title: "Login Successful",
           description: `Welcome back ${res.data.username}`,
         });
+        navigate("/");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -77,10 +80,10 @@ const Login = () => {
   return (
     <div
       className="flex flex-col items-center justify-center md:flex-row
-     gap-4 h-full pt-44"
+     gap-10 h-full pt-44"
     >
       <div className="basis-1/4 hidden md:block">
-        <img src={devlogo} alt="dev_logo" className="w-10" />
+        <img src={developer} alt="dev_logo" className="" />
       </div>
       <div className="w-full max-w-md rounded-md px-6 py-10">
         <h1 className="mb-4 border-l-4 border-[var(--red-color)] pl-4">

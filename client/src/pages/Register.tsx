@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 /* Icons */
 import { FaRegCircleUser } from "react-icons/fa6";
 import { CiMail } from "react-icons/ci";
@@ -13,7 +13,7 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { IoSend } from "react-icons/io5";
 import { AiOutlineLoading } from "react-icons/ai";
 /* Assets */
-import devlogo from "@/assets/dev.svg";
+import developer2 from "@/assets/developer2.svg";
 /* UI Components */
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,7 @@ const formSchema = z.object({
 const Register = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,6 +61,7 @@ const Register = () => {
           description: `${res.data.username} account has been created successfully.`,
           action: <Link to="/login">Login</Link>,
         });
+        navigate("/login");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -81,10 +83,10 @@ const Register = () => {
   return (
     <div
       className="flex flex-col items-center justify-center md:flex-row
-     gap-4 h-full pt-32"
+     gap-10 h-full pt-32"
     >
       <div className="basis-1/4 hidden md:block">
-        <img src={devlogo} alt="dev_logo" className="w-10" />
+        <img src={developer2} alt="dev_logo" className="" />
       </div>
       <div className="w-full max-w-md rounded-md px-6 py-10">
         <h1 className="mb-4 border-l-4 border-[var(--red-color)] pl-4">
