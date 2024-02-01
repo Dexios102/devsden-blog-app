@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 /* Redux */
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 /* UI Components */
 import ModeToggle from "./theme/mode-toggle";
 import { Input } from "./ui/input";
@@ -18,7 +18,7 @@ const Navbar = () => {
   const { userNow } = useSelector((state: RootState) => state.user);
   return (
     <nav className="flex justify-between items-center pt-6">
-      <div className="mr-4">
+      <div className="mr-10">
         <Link to="/">
           <button className="flex items-center gap-2">
             <img src={devlogo} alt="dev_logo" className="w-10" />
@@ -27,27 +27,28 @@ const Navbar = () => {
         </Link>
       </div>
       <div className="flex items-center md:gap-4">
-        <div
-          className="md:flex gap-4 font-medium 
-        bg-gray-100 mx-2
-       rounded-md px-2 dark:bg-gray-900 hidden"
-        >
-          <Link to="/">
-            <Button variant="noneLine">Home</Button>
-          </Link>
-          <Link to="/about">
-            <Button variant="noneLine">About</Button>
-          </Link>
-          <Link to="/projects">
-            <Button variant="noneLine">Projects</Button>
-          </Link>
-        </div>
-        <div className="w-full max-w-sm relative hidden md:block">
-          <Input placeholder="Search" type="text" />
-          <CiSearch
-            className="w-5 h-5 absolute right-3 top-1/2
+        <div className="hidden md:flex flex-row items-center rounded-l-full bg-muted pl-4">
+          <div
+            className="md:flex gap-4 font-medium mx-2
+       rounded-md px-2 hidden"
+          >
+            <Link to="/">
+              <Button variant="noneLine">Home</Button>
+            </Link>
+            <Link to="/about">
+              <Button variant="noneLine">About</Button>
+            </Link>
+            <Link to="/projects">
+              <Button variant="noneLine">Projects</Button>
+            </Link>
+          </div>
+          <div className="w-full max-w-sm relative">
+            <Input placeholder="Search" type="text" />
+            <CiSearch
+              className="w-5 h-5 absolute right-3 top-1/2
            -translate-y-1/2"
-          />
+            />
+          </div>
         </div>
         <div>
           <ModeToggle />
@@ -56,7 +57,7 @@ const Navbar = () => {
           <div className="hidden md:block">
             <Link to="/profile">
               <Avatar>
-                <AvatarImage src={userNow.profilePic} />
+                <AvatarImage src={userNow?.profilePic} />
                 <AvatarFallback>DD</AvatarFallback>
               </Avatar>
             </Link>

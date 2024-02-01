@@ -11,7 +11,7 @@ export const googleAuth = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, email, googleImg }: any = req.body;
+  const { username, email, profilePic }: any = req.body;
   try {
     let user = await User.findOne({ email });
     if (!user) {
@@ -19,11 +19,11 @@ export const googleAuth = async (
       const hashedPassword = await bcrypt.hash(generatePassword, 10);
       user = new User({
         username:
-          name.toLowerCase().split(" ").join("_") +
+          username.toLowerCase().split(" ").join("_") +
           Math.random().toString(9).slice(-5),
         email,
         password: hashedPassword,
-        profilePic: googleImg,
+        profilePic: profilePic,
         created_at: new Date(),
       });
       await user.save();
@@ -50,7 +50,10 @@ export const googleAuth = async (
     res.status(200).json({
       msg: "Login Successful",
       status: 200,
-      data: user,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profilePic,
+      token: token,
     });
   } catch (error: any) {
     errorHandler(error, req, res, next);

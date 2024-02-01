@@ -1,23 +1,25 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
-interface User {
+export interface User {
   username: string;
   email: string;
+  profilePic: string;
 }
 
-interface UserState {
-  user: User | null;
+export interface UserState {
+  userNow: User | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
-  user: null,
+  userNow: null,
   loading: false,
   error: null,
 };
 
-const userSlice = createSlice({
+export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -26,15 +28,16 @@ const userSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action: PayloadAction<User>) => {
+      state.userNow = action.payload;
       state.loading = false;
-      state.user = action.payload;
+      state.error = null;
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
       state.error = action.payload;
     },
     logout: (state) => {
-      state.user = null;
+      state.userNow = null;
       state.loading = false;
       state.error = null;
     },

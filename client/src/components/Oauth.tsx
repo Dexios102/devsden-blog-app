@@ -23,15 +23,15 @@ const Oauth = () => {
     try {
       const googleResponse = await signInWithPopup(auth, provider);
       const res = await axios.post("/auth/google", {
-        name: googleResponse.user.displayName,
+        username: googleResponse.user.displayName,
         email: googleResponse.user.email,
-        googleImg: googleResponse.user.photoURL,
+        profilePic: googleResponse.user.photoURL,
       });
       if (res.data) {
         dispatch(loginSuccess(res.data));
         toast({
           title: "Google Login Successful",
-          description: "Welcome back to DevsDen",
+          description: `Welcome back ${res.data.username}`,
         });
         navigate("/");
       }
