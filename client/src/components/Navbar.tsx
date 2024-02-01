@@ -17,6 +17,8 @@ import devlogo from "@/assets/dev.svg";
 /* Icons */
 import { CgLogIn } from "react-icons/cg";
 import { CiSearch } from "react-icons/ci";
+import { FaHome } from "react-icons/fa";
+import { MdSpaceDashboard } from "react-icons/md";
 
 const Navbar = () => {
   const { userNow } = useSelector((state: RootState) => state.user);
@@ -60,13 +62,14 @@ const Navbar = () => {
        rounded-md px-2 hidden"
           >
             <Link to="/">
-              <Button variant="noneLine">Home</Button>
+              <Button variant="noneLine">
+                <FaHome className="w-5 h-5" />
+              </Button>
             </Link>
             <Link to="/about">
-              <Button variant="noneLine">About</Button>
-            </Link>
-            <Link to="/projects">
-              <Button variant="noneLine">Projects</Button>
+              <Button variant="noneLine">
+                <MdSpaceDashboard className="w-5 h-5" />
+              </Button>
             </Link>
           </div>
           <div className="w-full max-w-sm relative">
