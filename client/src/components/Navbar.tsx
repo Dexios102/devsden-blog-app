@@ -46,7 +46,7 @@ const Navbar = () => {
     }
   };
   return (
-    <nav className="flex justify-between items-center pt-6">
+    <nav className="flex justify-between items-center pt-6 bg-background">
       <div className="mr-10">
         <Link to="/">
           <button className="flex items-center gap-2">
@@ -58,7 +58,7 @@ const Navbar = () => {
       <div className="flex items-center md:gap-4">
         <div className="hidden md:flex flex-row items-center rounded-l-full bg-muted pl-4">
           <div
-            className="md:flex gap-4 font-medium mx-2
+            className="md:flex gap-2 font-medium mx-2
        rounded-md px-2 hidden"
           >
             <Link to="/">
@@ -66,7 +66,7 @@ const Navbar = () => {
                 <FaHome className="w-5 h-5" />
               </Button>
             </Link>
-            <Link to="/about">
+            <Link to="/dashboard">
               <Button variant="noneLine">
                 <MdSpaceDashboard className="w-5 h-5" />
               </Button>

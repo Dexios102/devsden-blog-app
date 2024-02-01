@@ -11,7 +11,6 @@ import {
   NotFound,
 } from "../pages";
 import PrivateRoute from "@/components/PrivateRoute";
-import Profile from "@/pages/Profile";
 
 const Layout = () => {
   return (
@@ -26,7 +25,6 @@ const Layout = () => {
           <Route path="/register" element={<Register />} />
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
           </Route>
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
