@@ -12,8 +12,8 @@ export const getAllUsers = async (
     const users = await User.find();
     if (users) {
       return res.status(200).json({
-        users: users,
         msg: `Successfully fetched ${users.length} users`,
+        users: users,
       });
     }
   } catch (error: any) {

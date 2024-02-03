@@ -3,9 +3,13 @@ import bcrypt from "bcrypt";
 
 import User from "../models/user-model";
 import { errorHandler } from "../utils/error-handler";
-import { generateTokenCookie } from "../utils/generateTokenCookie";
-import { GoogleAuthRequest, SignUpRequest } from "../utils/types";
 import { clearCookie } from "../utils/clearCookie";
+import { generateTokenCookie } from "../utils/generateTokenCookie";
+import {
+  GoogleAuthRequest,
+  SignInRequest,
+  SignUpRequest,
+} from "../utils/types";
 
 export const googleAuth = async (
   req: Request<{}, {}, GoogleAuthRequest>,
@@ -14,28 +18,25 @@ export const googleAuth = async (
 ) => {
   const { username, email, profilePic }: any = req.body;
   try {
-    const userExisted = await User.findOne({ email: email });
-    if (userExisted) {
-      return res.status(200).json({
-        msg: `User ${email} already exists`,
-        status: 200,
+    let user = await User.findOne({ email: email });
+    if (!user) {
+      const autoPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(autoPassword, 10);
+      user = new User({
+        username:
+          username.toLowerCase().split(" ").join("_") +
+          Math.random().toString(9).slice(-3),
+        email: email,
+        password: hashedPassword,
+        profilePic: profilePic,
       });
+      await user.save();
     }
-    const autoPassword = Math.random().toString(36).slice(-8);
-    const hashedPassword = await bcrypt.hash(autoPassword, 10);
-    const user = new User({
-      username:
-        username.toLowerCase().split(" ").join("_") +
-        Math.random().toString(9).slice(-3),
-      email: email,
-      password: hashedPassword,
-      profilePic: profilePic,
-    });
-    await user.save();
     clearCookie(res);
     generateTokenCookie(user, res);
     res.status(200).json({
       msg: "Login successful",
+      userId: user._id.toString(),
       username: user.username,
       email: user.email,
       profilePic: user.profilePic,
@@ -90,7 +91,7 @@ export const userSignUp = async (
 
 /* User Login */
 export const userSignIn = async (
-  req: Request,
+  req: Request<{}, {}, SignInRequest>,
   res: Response,
   next: NextFunction
 ) => {

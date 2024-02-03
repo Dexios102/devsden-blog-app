@@ -1,5 +1,5 @@
 /* Error Handler */
-import { Request, Response, NextFunction } from "express";
+import { Response } from "express";
 
 export const errorHandler = (error: any, res: Response) => {
   console.error(error);

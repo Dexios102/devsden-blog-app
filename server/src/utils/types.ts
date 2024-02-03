@@ -10,3 +10,8 @@ export interface GoogleAuthRequest {
   email: string;
   profilePic: string;
 }
+
+export interface SignInRequest {
+  email: string;
+  password: string;
+}
