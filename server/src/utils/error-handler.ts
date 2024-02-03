@@ -1,18 +1,11 @@
 /* Error Handler */
-
 import { Request, Response, NextFunction } from "express";
 
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  console.error(err);
+export const errorHandler = (error: any, res: Response) => {
+  console.error(error);
   return res.status(500).json({
     msg: "Internal Server Error",
-    error: err.message,
+    error: error.message,
     status: 500,
-    success: false,
   });
 };
