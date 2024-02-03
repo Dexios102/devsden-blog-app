@@ -1,66 +1,52 @@
-import User from "../models/user-model";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
-import { generateToken } from "../middlewares/verify-token";
-import { COOKIE_NAME } from "../utils/constants";
 
-import { errorHandler } from "../middlewares/error-handler";
+import User from "../models/user-model";
+import { errorHandler } from "../utils/error-handler";
+import { generateTokenCookie } from "../utils/generateTokenCookie";
+import { GoogleAuthRequest, SignUpRequest } from "../utils/types";
+import { clearCookie } from "../utils/clearCookie";
 
 export const googleAuth = async (
-  req: Request,
+  req: Request<{}, {}, GoogleAuthRequest>,
   res: Response,
   next: NextFunction
 ) => {
   const { username, email, profilePic }: any = req.body;
   try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      const generatePassword = Math.random().toString(36).slice(-8);
-      const hashedPassword = await bcrypt.hash(generatePassword, 10);
-      user = new User({
-        username:
-          username.toLowerCase().split(" ").join("_") +
-          Math.random().toString(9).slice(-5),
-        email,
-        password: hashedPassword,
-        profilePic: profilePic,
-        created_at: new Date(),
+    const userExisted = await User.findOne({ email: email });
+    if (userExisted) {
+      return res.status(200).json({
+        msg: `User ${email} already exists`,
+        status: 200,
       });
-      await user.save();
     }
-    res.clearCookie(COOKIE_NAME, {
-      httpOnly: true,
-      path: "/",
-      domain: "localhost",
-      signed: true,
+    const autoPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(autoPassword, 10);
+    const user = new User({
+      username:
+        username.toLowerCase().split(" ").join("_") +
+        Math.random().toString(9).slice(-3),
+      email: email,
+      password: hashedPassword,
+      profilePic: profilePic,
     });
-    const token = generateToken(user._id.toString(), user.email, "1d");
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 1);
-
-    res.cookie(COOKIE_NAME, token, {
-      httpOnly: true,
-      path: "/",
-      domain: "localhost",
-      expires,
-      signed: true,
-    });
-
+    await user.save();
+    clearCookie(res);
+    generateTokenCookie(user, res);
     res.status(200).json({
-      msg: "Login Successful",
-      status: 200,
+      msg: "Login successful",
       username: user.username,
       email: user.email,
       profilePic: user.profilePic,
-      token: token,
     });
   } catch (error: any) {
-    errorHandler(error, req, res, next);
+    errorHandler(error, res);
   }
 };
 
 export const userSignUp = async (
-  req: Request,
+  req: Request<{}, {}, SignUpRequest>,
   res: Response,
   next: NextFunction
 ) => {
@@ -75,12 +61,11 @@ export const userSignUp = async (
     }
     if (password !== confirmPassword) {
       return res.status(400).json({
-        msg: "Passwords do not match",
+        msg: "Passwords does not match",
         status: 400,
       });
     }
-    const saltRounds: number = 10;
-    const hashedPassword: any = await bcrypt.hash(password, saltRounds);
+    const hashedPassword: any = await bcrypt.hash(password, 10);
     if (hashedPassword) {
       const user = new User({
         username: username,
@@ -89,23 +74,8 @@ export const userSignUp = async (
         created_at: new Date(),
       });
       await user.save();
-      res.clearCookie(COOKIE_NAME, {
-        httpOnly: true,
-        path: "/",
-        domain: "localhost",
-        signed: true,
-      });
-      /* Generate JWT */
-      const token = generateToken(user._id.toString(), user.email, "1d");
-      const expires = new Date();
-      expires.setDate(expires.getDate() + 1);
-      res.cookie(COOKIE_NAME, token, {
-        httpOnly: true,
-        path: "/",
-        domain: "localhost",
-        expires,
-        signed: true,
-      });
+      clearCookie(res);
+      generateTokenCookie(user, res);
       return res.status(201).json({
         username: user.username,
         email: user.email,
@@ -114,7 +84,7 @@ export const userSignUp = async (
       });
     }
   } catch (error: any) {
-    errorHandler(error, req, res, next);
+    errorHandler(error, res);
   }
 };
 
@@ -140,38 +110,17 @@ export const userSignIn = async (
         status: 400,
       });
     }
-    res.clearCookie(COOKIE_NAME, {
-      httpOnly: true,
-      path: "/",
-      domain: "localhost",
-      signed: true,
-    });
-    /* Generate JWT */
-    const token = generateToken(user._id.toString(), user.email, "1d");
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 1);
-    res.cookie(COOKIE_NAME, token, {
-      httpOnly: true,
-      path: "/",
-      domain: "localhost",
-      expires,
-      signed: true,
-    });
-
+    clearCookie(res);
+    generateTokenCookie(user, res);
     return res.status(200).json({
       userId: user._id.toString(),
       username: user.username,
       email: user.email,
-      msg: "User logged in successfully",
+      msg: `${email} logged in successfully`,
       status: 200,
     });
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({
-      msg: "Internal Server Error",
-      error: error.message,
-      status: 500,
-    });
+    errorHandler(error, res);
   }
 };
 
@@ -202,12 +151,7 @@ export const verifyUser = async (
       status: 200,
     });
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({
-      msg: "Internal Server Error",
-      error: error.message,
-      status: 500,
-    });
+    errorHandler(error, res);
   }
 };
 
@@ -218,22 +162,11 @@ export const userSignOut = async (
   next: NextFunction
 ) => {
   try {
-    res.clearCookie(COOKIE_NAME, {
-      httpOnly: true,
-      path: "/",
-      domain: "localhost",
-      signed: true,
-    });
+    clearCookie(res);
     return res.status(200).json({
       msg: "User logged out successfully",
-      status: 200,
     });
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({
-      msg: "Internal Server Error",
-      error: error.message,
-      status: 500,
-    });
+    errorHandler(error, res);
   }
 };
