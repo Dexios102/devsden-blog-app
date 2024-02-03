@@ -11,11 +11,11 @@ const Sidebar = () => {
   return (
     <div
       className="max-h-full
-     py-4 flex flex-col px-2 border-r-4 border-muted"
+     py-4 flex flex-col px-2 border-r-2 border-muted"
     >
       <div
         className="text-center bg-blue-200 text-blue-900
-      rounded-full text-sm font-medium"
+      rounded-md text-sm font-medium"
       >
         Admin
       </div>
