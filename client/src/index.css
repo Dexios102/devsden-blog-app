@@ -75,7 +75,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground mx-12;
+    @apply bg-background text-foreground mx-6 md:mx-12;
   }
   h1 {
     @apply text-2xl font-medium;

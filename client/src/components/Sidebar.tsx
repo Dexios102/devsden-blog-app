@@ -1,3 +1,4 @@
+import useLogout from "@/hooks/useLogout";
 /* Icons */
 import { FaChartSimple } from "react-icons/fa6";
 import { IoNewspaper } from "react-icons/io5";
@@ -7,7 +8,9 @@ import { FaUser } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 /* Ui Components */
 import { Button } from "./ui/button";
+
 const Sidebar = () => {
+  const handleLogout = useLogout();
   return (
     <div
       className="max-h-full
@@ -38,7 +41,7 @@ const Sidebar = () => {
         </Button>
       </div>
       <div className="mt-[28rem] flex flex-col items-center gap-6 mb-6">
-        <Button variant="ghost">
+        <Button variant="ghost" onClick={handleLogout}>
           <IoMdLogOut className="w-6 h-6 text-[var(--red-color)]" />
         </Button>
       </div>

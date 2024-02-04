@@ -94,7 +94,10 @@ const Register = () => {
         </h1>
         <hr className="mb-4" />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-3 mb-2"
+          >
             <FormField
               control={form.control}
               name="username"
@@ -194,8 +197,8 @@ const Register = () => {
                 </span>
               )}
             </Button>
-            <Oauth />
           </form>
+          <Oauth />
           <div className="mt-6 text-sm text-muted-foreground text-center">
             Already have an account?{" "}
             <Link to="/login" className="text-brand hover:underline">

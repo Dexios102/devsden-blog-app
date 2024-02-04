@@ -91,7 +91,10 @@ const Login = () => {
         </h1>
         <hr className="mb-4" />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-3 mb-2"
+          >
             <FormField
               control={form.control}
               name="email"
@@ -164,8 +167,8 @@ const Login = () => {
                 </span>
               )}
             </Button>
-            <Oauth />
           </form>
+          <Oauth />
           <div className="mt-6 text-sm text-muted-foreground text-center">
             Don't have an account?{" "}
             <Link to="/register" className="text-brand hover:underline">

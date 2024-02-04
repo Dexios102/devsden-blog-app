@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
-import axios, { AxiosError } from "axios";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { signOutSuccess, signOutFailure } from "@/redux/user/user-slice";
 import ProfileDrop from "./ProfileDrop";
+import useLogout from "@/hooks/useLogout";
 /* Redux */
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
@@ -11,7 +8,6 @@ import type { RootState } from "@/redux/store";
 import ModeToggle from "./theme/mode-toggle";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useToast } from "./ui/use-toast";
 /* Assets */
 import devlogo from "@/assets/dev.svg";
 /* Icons */
@@ -22,29 +18,7 @@ import { MdSpaceDashboard } from "react-icons/md";
 
 const Navbar = () => {
   const { userNow } = useSelector((state: RootState) => state.user);
-  const { toast } = useToast();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    try {
-      await axios.post("/auth/signout");
-      dispatch(signOutSuccess());
-      toast({ title: "Logout Successful", description: "See you soon!" });
-      navigate("/login");
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response && error.response.data && error.response.data.msg) {
-          dispatch(signOutFailure(error.response.data.msg));
-          toast({ title: "Error", description: error.response.data.msg });
-        } else {
-          toast({
-            title: "Error",
-            description: "Something went wrong, try again",
-          });
-        }
-      }
-    }
-  };
+  const handleLogout = useLogout();
   return (
     <nav className="flex justify-between items-center pt-6 bg-background">
       <div className="mr-10">
