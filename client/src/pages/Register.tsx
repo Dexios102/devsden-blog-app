@@ -1,10 +1,7 @@
 /* Packages */
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import axios, { AxiosError } from "axios";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Oauth from "@/components/Oauth";
+import useFormRegister from "@/hooks/useFormRegister";
 /* Icons */
 import { FaRegCircleUser } from "react-icons/fa6";
 import { CiMail } from "react-icons/ci";
@@ -27,59 +24,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/components/ui/use-toast";
-import Oauth from "@/components/Oauth";
-
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
-  email: z.string().email(),
-  password: z.string().min(6).max(50),
-  confirmPassword: z.string().min(6).max(50),
-});
 
 const Register = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    try {
-      const res = await axios.post("/auth/signup", values);
-      if (res.data) {
-        console.log(res.data);
-        toast({
-          title: "Account created",
-          description: `${res.data.username} account has been created successfully.`,
-          action: <Link to="/login">Login</Link>,
-        });
-        navigate("/login");
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        console.error(error);
-        if (error.response && error.response.data && error.response.data.msg) {
-          toast({ title: "Error", description: error.response.data.msg });
-        } else {
-          toast({
-            title: "Error",
-            description: "Something went wrong, try again",
-          });
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  const { form, onSubmit, loading } = useFormRegister();
   return (
     <div
       className="flex flex-col items-center justify-center md:flex-row
