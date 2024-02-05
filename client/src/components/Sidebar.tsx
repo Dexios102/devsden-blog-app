@@ -15,10 +15,7 @@ const Sidebar = () => {
   const tab = useTab();
   const handleLogout = useLogout();
   return (
-    <div
-      className="max-h-full
-     py-10 flex flex-col px-2 border-r-2 border-muted"
-    >
+    <div className="max-h-full flex flex-col px-2 border-r-2 border-muted md:h-[92vh]">
       <div className="mt-6 flex flex-col items-center gap-6">
         <Link to="/dashboard?tab=analytics">
           <Button variant={tab === "analytics" ? "active" : "ghost"}>

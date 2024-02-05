@@ -1,4 +1,14 @@
 import { RootState } from "@/redux/store";
+import axios, { AxiosError } from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import {
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+} from "@/redux/user/user-slice";
+import { useDispatch } from "react-redux";
+import useLogout from "@/hooks/useLogout";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
@@ -10,13 +20,52 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
 const Profile = () => {
+  const dispatch = useDispatch();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const logout = useLogout();
   const { userNow } = useSelector((state: RootState) => state.user);
+  const deleteAccount = async () => {
+    dispatch(deleteUserStart());
+    try {
+      const res = await axios.delete(`/users/user/${userNow?._id}`);
+      if (res.data) {
+        dispatch(deleteUserSuccess());
+        toast({ title: "Account deleted", description: "See you soon!" });
+        logout();
+        navigate("/login");
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response && error.response.data && error.response.data.msg) {
+          dispatch(deleteUserFailure(error.response.data.msg));
+          toast({ title: "Error", description: error.response.data.msg });
+        } else {
+          toast({
+            title: "Error",
+            description: "Something went wrong, try again",
+          });
+        }
+      }
+    }
+  };
   const formatDate = (dateString: string): string => {
     const options: Intl.DateTimeFormatOptions = {
       month: "long",
@@ -35,7 +84,7 @@ const Profile = () => {
   return (
     <div
       className="flex flex-col md:flex-row items-center justify-evenly
-    w-full md:h-[92vh] gap-10"
+    w-full gap-10"
     >
       <div className="flex flex-col justify-center items-center pt-10">
         <div className="flex items-center gap-4 pb-4 ">
@@ -62,6 +111,33 @@ const Profile = () => {
         <p className="mt-4 max-w-sm text-gray-700 dark:text-gray-400 text-center">
           {userNow?.bio}
         </p>
+        <div className="flex items-center gap-4 w-full">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="w-full mt-4">
+                Delete Account
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={deleteAccount}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button className="w-full mt-4" variant="outline" onClick={logout}>
+            Sign Out
+          </Button>
+        </div>
       </div>
       <Tabs defaultValue="account" className="w-[400px] pb-10">
         <TabsList className="grid w-full grid-cols-2">

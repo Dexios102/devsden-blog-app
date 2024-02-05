@@ -20,3 +20,41 @@ export const getAllUsers = async (
     errorHandler(error, res);
   }
 };
+
+/* Get User */
+export const getUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      return res.status(200).json({
+        msg: `Successfully fetched user`,
+        user: user,
+      });
+    }
+  } catch (error: any) {
+    errorHandler(error, res);
+  }
+};
+
+/* Delete User */
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (user) {
+      return res.status(200).json({
+        msg: `Successfully deleted user`,
+        user: user,
+      });
+    }
+  } catch (error: any) {
+    errorHandler(error, res);
+  }
+};
