@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User } from "@/redux/user/user-slice";
+import { UserData } from "@/redux/user/user-slice";
 /* Icons */
 import { CiUser } from "react-icons/ci";
 import { IoIosLogOut } from "react-icons/io";
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface ProfileDropProps {
-  userNow: User | null;
+  userNow: UserData | null;
   handleLogout: () => void;
 }
 const ProfileDrop: React.FC<ProfileDropProps> = ({ userNow, handleLogout }) => {
@@ -53,10 +53,10 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({ userNow, handleLogout }) => {
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
           </Link>
-          <Link to="/dashboard">
+          <Link to="/">
             <DropdownMenuItem>
               <MdSpaceDashboard className="mr-2 h-4 w-4" />
-              <span>Dashboard</span>
+              <span>Home</span>
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
           </Link>
@@ -67,23 +67,23 @@ const ProfileDrop: React.FC<ProfileDropProps> = ({ userNow, handleLogout }) => {
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <Link to="/">
+                <Link to="/dashboard">
                   <DropdownMenuItem>
                     <GoFileSubmodule className="mr-2 h-4 w-4" />
                     <span>Home</span>
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuSeparator />
-                <Link to="/projects">
+                <Link to="/post">
                   <DropdownMenuItem>
                     <FaHome className="mr-2 h-4 w-4" />
                     <span>Projects</span>
                   </DropdownMenuItem>
                 </Link>
-                <Link to="/about">
+                <Link to="/comment">
                   <DropdownMenuItem>
                     <CiCircleInfo className="mr-2 h-4 w-4" />
-                    <span>About</span>
+                    <span>Comments</span>
                   </DropdownMenuItem>
                 </Link>
               </DropdownMenuSubContent>

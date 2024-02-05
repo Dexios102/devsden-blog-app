@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import useLogout from "@/hooks/useLogout";
+import useTab from "@/hooks/useTab";
 /* Icons */
 import { FaChartSimple } from "react-icons/fa6";
 import { IoNewspaper } from "react-icons/io5";
@@ -10,35 +12,39 @@ import { IoMdLogOut } from "react-icons/io";
 import { Button } from "./ui/button";
 
 const Sidebar = () => {
+  const tab = useTab();
   const handleLogout = useLogout();
   return (
     <div
       className="max-h-full
-     py-4 flex flex-col px-2 border-r-2 border-muted"
+     py-10 flex flex-col px-2 border-r-2 border-muted"
     >
-      <div
-        className="text-center bg-blue-200 text-blue-900
-      rounded-md text-sm font-medium"
-      >
-        Admin
-      </div>
-      <div className="border-b border-gray-700 mt-4"></div>
       <div className="mt-6 flex flex-col items-center gap-6">
-        <Button variant="ghost">
-          <FaChartSimple className="w-6 h-6" />
-        </Button>
-        <Button variant="ghost">
-          <FaUser className="w-6 h-6" />
-        </Button>
-        <Button variant="ghost">
-          <IoNewspaper className="w-6 h-6" />
-        </Button>
-        <Button variant="ghost">
-          <AiFillMessage className="w-6 h-6" />
-        </Button>
-        <Button variant="ghost">
-          <FaPeopleLine className="w-6 h-6" />
-        </Button>
+        <Link to="/dashboard?tab=analytics">
+          <Button variant={tab === "analytics" ? "active" : "ghost"}>
+            <FaChartSimple className="w-6 h-6" />
+          </Button>
+        </Link>
+        <Link to="/dashboard?tab=profile">
+          <Button variant={tab === "profile" ? "active" : "ghost"}>
+            <FaUser className="w-6 h-6" />
+          </Button>
+        </Link>
+        <Link to="/dashboard?tab=post">
+          <Button variant={tab === "post" ? "active" : "ghost"}>
+            <IoNewspaper className="w-6 h-6" />
+          </Button>
+        </Link>
+        <Link to="/dashboard?tab=comments">
+          <Button variant={tab === "comments" ? "active" : "ghost"}>
+            <AiFillMessage className="w-6 h-6" />
+          </Button>
+        </Link>
+        <Link to="/dashboard?tab=users">
+          <Button variant={tab === "users" ? "active" : "ghost"}>
+            <FaPeopleLine className="w-6 h-6" />
+          </Button>
+        </Link>
       </div>
       <div className="mt-[28rem] flex flex-col items-center gap-6 mb-6">
         <Button variant="ghost" onClick={handleLogout}>
