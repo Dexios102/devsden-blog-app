@@ -1,14 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export interface User {
+export interface UserData {
+  _id: string;
   username: string;
   email: string;
   profilePic: string;
+  bio: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserState {
-  userNow: User | null;
+  userNow: UserData | null;
   loading: boolean;
   error: string | null;
 }
@@ -27,8 +31,8 @@ export const userSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    loginSuccess: (state, action: PayloadAction<User>) => {
-      state.userNow = action.payload;
+    loginSuccess: (state, action: PayloadAction<{ userData: UserData }>) => {
+      state.userNow = action.payload.userData;
       state.loading = false;
       state.error = null;
     },

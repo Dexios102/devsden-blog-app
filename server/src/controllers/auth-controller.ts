@@ -29,6 +29,7 @@ export const googleAuth = async (
         email: email,
         password: hashedPassword,
         profilePic: profilePic,
+        bio: "No bio",
       });
       await user.save();
     }
@@ -36,10 +37,7 @@ export const googleAuth = async (
     generateTokenCookie(user, res);
     res.status(200).json({
       msg: "Login successful",
-      userId: user._id.toString(),
-      username: user.username,
-      email: user.email,
-      profilePic: user.profilePic,
+      userData: user,
     });
   } catch (error: any) {
     errorHandler(error, res);
