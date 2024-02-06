@@ -27,11 +27,11 @@ const Oauth = () => {
         email: googleResponse.user.email,
         profilePic: googleResponse.user.photoURL,
       });
-      if (res.data) {
+      if (res.data.userData) {
         dispatch(loginSuccess(res.data));
         toast({
           title: "Google Login Successful",
-          description: `Welcome back ${res.data.username}`,
+          description: `Welcome back ${res.data.userData.username}`,
         });
         navigate("/");
       }

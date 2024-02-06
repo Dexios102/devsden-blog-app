@@ -6,6 +6,9 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
 } from "@/redux/user/user-slice";
 import { useDispatch } from "react-redux";
 import useLogout from "@/hooks/useLogout";
@@ -35,6 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -42,6 +46,33 @@ const Profile = () => {
   const navigate = useNavigate();
   const logout = useLogout();
   const { userNow } = useSelector((state: RootState) => state.user);
+  const [username, setUsername] = useState<string>(userNow?.username || "");
+  const [bio, setBio] = useState<string>(userNow?.bio || "");
+
+  const handleUpdateUser = async () => {
+    dispatch(updateUserStart());
+    try {
+      const res = await axios.patch(`/users/user/${userNow?._id}`, {
+        username,
+        bio,
+      });
+      if (res.data) {
+        dispatch(updateUserSuccess(res.data));
+        toast({
+          title: "Updated successfully",
+          description: `${username} data was updated successfully!`,
+        });
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response && error.response.data && error.response.data.msg) {
+          dispatch(updateUserFailure(error.response.data.msg));
+          toast({ title: "Error", description: error.response.data.msg });
+        }
+      }
+    }
+  };
+
   const deleteAccount = async () => {
     dispatch(deleteUserStart());
     try {
@@ -166,7 +197,11 @@ const Profile = () => {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" defaultValue={userNow?.username} />
+                <Input
+                  id="username"
+                  defaultValue={userNow?.username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
               </div>
               <div className="space-y-1">
                 <Label htmlFor="email">Email</Label>
@@ -177,8 +212,11 @@ const Profile = () => {
                 <Textarea
                   placeholder="Type your message here."
                   id="bio"
+                  name="bio"
+                  value={bio}
                   defaultValue={userNow?.bio}
                   className="text-gray-700 dark:text-gray-400"
+                  onChange={(e) => setBio(e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground">
                   Your bio will be shown on your profile.
@@ -186,7 +224,9 @@ const Profile = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Save changes</Button>
+              <Button className="w-full" onClick={handleUpdateUser}>
+                Save changes
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
