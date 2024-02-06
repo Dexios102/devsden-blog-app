@@ -9,6 +9,7 @@ import {
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
+  signOutSuccess,
 } from "@/redux/user/user-slice";
 import { useDispatch } from "react-redux";
 import useLogout from "@/hooks/useLogout";
@@ -34,11 +35,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import { useState, useRef, useEffect } from "react";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "@/firebase";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -48,11 +59,63 @@ const Profile = () => {
   const { userNow } = useSelector((state: RootState) => state.user);
   const [username, setUsername] = useState<string>(userNow?.username || "");
   const [bio, setBio] = useState<string>(userNow?.bio || "");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageURL, setImageURL] = useState<string | null>(null);
+  const filePicker = useRef<HTMLInputElement>(null);
+  const [imageFileProgress, setImageFileProgress] = useState<number | null>(
+    null
+  );
+  const [imageFileError, setImageFileError] = useState<string | null>(null);
+
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const selectedFile = files[0];
+      setImageFile(selectedFile);
+      setImageURL(URL.createObjectURL(selectedFile));
+    }
+  };
+
+  useEffect(() => {
+    const uploadImage = () => {
+      if (imageFile) {
+        setImageFileError(null);
+        const storage = getStorage(app);
+        const fileName = new Date().getTime() + imageFile.name;
+        const storageRef = ref(storage, fileName);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setImageFileProgress(Number(progress.toFixed(0)));
+          },
+          () => {
+            setImageFileError("Could not upload Image (File size too large)");
+            setImageFileProgress(null);
+            setImageFile(null);
+            setImageURL(null);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setImageURL(downloadURL);
+            });
+          }
+        );
+      }
+    };
+    if (imageFile) {
+      uploadImage();
+    }
+  }, [imageFile]);
 
   const handleUpdateUser = async () => {
     dispatch(updateUserStart());
     try {
-      const res = await axios.patch(`/users/user/${userNow?._id}`, {
+      const res = await axios.put(`/users/update-user/${userNow?._id}`, {
         username,
         bio,
       });
@@ -62,6 +125,32 @@ const Profile = () => {
           title: "Updated successfully",
           description: `${username} data was updated successfully!`,
         });
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response && error.response.data && error.response.data.msg) {
+          dispatch(updateUserFailure(error.response.data.msg));
+          toast({ title: "Error", description: error.response.data.msg });
+        }
+      }
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    dispatch(updateUserStart());
+    try {
+      const res = await axios.put(`/users/update-password/${userNow?._id}`, {
+        newPassword,
+        confirmPassword,
+      });
+      if (res.data) {
+        dispatch(updateUserSuccess(res.data));
+        toast({
+          title: "Updated successfully",
+          description: `${username} password was updated successfully!`,
+        });
+        dispatch(signOutSuccess());
+        navigate("/login");
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -123,7 +212,7 @@ const Profile = () => {
             <AvatarImage
               src={userNow?.profilePic}
               alt="Avatar"
-              className="w-full h-full object-cover rounded-full
+              className="w-28 h-28 object-cover rounded-full
             border-2 border-primary shadow-md shadow-gray-500"
             />
             <AvatarFallback>DD</AvatarFallback>
@@ -184,16 +273,58 @@ const Profile = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex items-center justify-center">
+              <div
+                className="flex flex-col items-center justify-center gap-4 relative"
+                onClick={() => filePicker.current?.click()}
+              >
+                {imageFileProgress && (
+                  <CircularProgressbar
+                    value={imageFileProgress || 0}
+                    text={`${imageFileProgress}%`}
+                    strokeWidth={5}
+                    styles={{
+                      root: {
+                        width: "100%",
+                        height: "100%",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                      },
+                      path: {
+                        stroke: `rgba(62, 152, 199, ${
+                          imageFileProgress / 100
+                        })`,
+                      },
+                    }}
+                  />
+                )}
                 <Avatar>
                   <AvatarImage
-                    src={userNow?.profilePic}
+                    src={imageURL || userNow?.profilePic}
                     alt="Avatar"
-                    className="w-26 h-26 object-cover rounded-full
-            border-2 border-primary shadow-md shadow-gray-500"
+                    className={`w-28 h-28 object-cover rounded-full
+                    border-2 border-primary shadow-md shadow-gray-500
+                  ${
+                    imageFileProgress && imageFileProgress < 100 && "opacity-60"
+                  }`}
                   />
                   <AvatarFallback>DD</AvatarFallback>
                 </Avatar>
+                {imageFileError && (
+                  <Alert>
+                    <AlertTitle>Upload Error</AlertTitle>
+                    <AlertDescription>{imageFileError}</AlertDescription>
+                  </Alert>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage}
+                  ref={filePicker}
+                  className="rounded-lg text-sm border border-gray-700
+                  w-full"
+                  hidden
+                />
               </div>
               <div className="space-y-1">
                 <Label htmlFor="username">Username</Label>
@@ -240,16 +371,26 @@ const Profile = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="space-y-1">
-                <Label htmlFor="current">Current password</Label>
-                <Input id="current" type="password" />
+                <Label htmlFor="current">New Password</Label>
+                <Input
+                  id="current"
+                  type="password"
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="new">New password</Label>
-                <Input id="new" type="password" />
+                <Label htmlFor="new">Confirm Password</Label>
+                <Input
+                  id="new"
+                  type="password"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Save password</Button>
+              <Button className="w-full" onClick={handleUpdatePassword}>
+                Save password
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>

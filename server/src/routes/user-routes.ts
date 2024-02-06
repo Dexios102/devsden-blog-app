@@ -12,8 +12,8 @@ const userRoutes = Router();
 
 userRoutes.get("/all-users", verifyToken, getAllUsers);
 userRoutes.get("/user/:id", verifyToken, getUser);
-userRoutes.patch("/user/:id", verifyToken, updateUserInfo);
-userRoutes.patch("/user/password/:id", verifyToken, updateUserPassword);
+userRoutes.put("/update-user/:id", verifyToken, updateUserInfo);
+userRoutes.put("/update-password/:id", verifyToken, updateUserPassword);
 userRoutes.delete("/user/:id", verifyToken, deleteUser);
 
 export default userRoutes;

@@ -95,13 +95,18 @@ export const updateUserInfo = async (
     }
     const user = await User.findByIdAndUpdate(
       userId,
-      { username, bio },
+      {
+        $set: {
+          username: username,
+          bio: bio,
+        },
+      },
       { new: true }
     );
     if (user) {
       return res.status(200).json({
         msg: `Successfully updated user`,
-        user: user,
+        userData: user,
       });
     } else {
       return res.status(404).json({
@@ -119,7 +124,7 @@ export const updateUserPassword = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const { newPassword, confirmPassword } = req.body;
   const userId = req.params.id;
   try {
     if (res.locals.jwtData.id !== userId) {
@@ -133,13 +138,6 @@ export const updateUserPassword = async (
       return res.status(404).json({
         msg: "User not found",
         status: 404,
-      });
-    }
-    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!passwordMatch) {
-      return res.status(400).json({
-        msg: "Current password is incorrect",
-        status: 400,
       });
     }
     if (!newPassword || newPassword.trim().length < 6) {
