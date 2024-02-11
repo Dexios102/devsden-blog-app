@@ -78,26 +78,47 @@ export const updateUserInfo = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username, bio } = req.body;
+  const { username, profilePic, bio } = req.body;
   const userId = req.params.id;
-  try {
-    if (res.locals.jwtData.id !== userId) {
+  if (res.locals.jwtData.id !== userId) {
+    return res.status(403).json({
+      msg: "Unauthorized: You don't have permission to update this user",
+      status: 403,
+    });
+  }
+  if (username) {
+    if (username.length < 7 || username.length > 20) {
       return res.status(403).json({
-        msg: "Unauthorized: You don't have permission to update this user's information",
+        msg: "Username must be between 7 and 20 characters",
         status: 403,
       });
     }
-    if (!username || username.trim().length < 3) {
-      return res.status(400).json({
-        msg: "Username must be at least 3 characters long",
-        status: 400,
+    if (username.includes(" ")) {
+      return res.status(403).json({
+        msg: "Username cannot contain spaces",
+        status: 403,
       });
     }
+    if (username !== req.body.username.toLowerCase()) {
+      return res.status(403).json({
+        msg: "Username cannot be changed",
+        status: 403,
+      });
+    }
+    if (!username.match(/^[a-zA-Z0-9]+$/)) {
+      return res.status(403).json({
+        msg: "Username must only contain letters and numbers",
+        status: 403,
+      });
+    }
+  }
+  try {
     const user = await User.findByIdAndUpdate(
       userId,
       {
         $set: {
           username: username,
+          profilePic: profilePic,
           bio: bio,
         },
       },
@@ -116,6 +137,7 @@ export const updateUserInfo = async (
     }
   } catch (error: any) {
     errorHandler(error, res);
+    console.log(error.message);
   }
 };
 

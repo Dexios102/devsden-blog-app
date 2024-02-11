@@ -32,11 +32,12 @@ const useFormLogin = () => {
     dispatch(loginStart());
     try {
       const res = await axios.post("/auth/signin", values);
-      if (res.data) {
-        dispatch(loginSuccess(res.data));
+      const response = res.data;
+      if (response) {
+        dispatch(loginSuccess(response));
         toast({
           title: "Login Successful",
-          description: `Welcome back ${res.data.username}`,
+          description: `Welcome back ${response.userData.username}`,
         });
         navigate("/");
       }

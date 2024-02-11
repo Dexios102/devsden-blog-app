@@ -1,7 +1,7 @@
+// React & Redux
+import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import axios, { AxiosError } from "axios";
-import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
 import {
   deleteUserStart,
   deleteUserSuccess,
@@ -11,10 +11,13 @@ import {
   updateUserSuccess,
   signOutSuccess,
 } from "@/redux/user/user-slice";
-import { useDispatch } from "react-redux";
+// React Router
+import { useNavigate } from "react-router-dom";
+// Custom Hooks
 import useLogout from "@/hooks/useLogout";
+// UI Components
+import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,9 +43,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import { useState, useRef, useEffect } from "react";
+import { Progress } from "@/components/ui/progress";
+
+// Firebase
 import {
   getDownloadURL,
   getStorage,
@@ -50,6 +53,8 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "@/firebase";
+// Axios
+import axios, { AxiosError } from "axios";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -57,8 +62,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const logout = useLogout();
   const { userNow } = useSelector((state: RootState) => state.user);
-  const [username, setUsername] = useState<string>(userNow?.username || "");
-  const [bio, setBio] = useState<string>(userNow?.bio || "");
+  const [formData, setFormData] = useState({});
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -78,61 +82,95 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    const uploadImage = () => {
-      if (imageFile) {
-        setImageFileError(null);
-        const storage = getStorage(app);
-        const fileName = new Date().getTime() + imageFile.name;
-        const storageRef = ref(storage, fileName);
-        const uploadTask = uploadBytesResumable(storageRef, imageFile);
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setImageFileProgress(Number(progress.toFixed(0)));
-          },
-          () => {
-            setImageFileError("Could not upload Image (File size too large)");
-            setImageFileProgress(null);
-            setImageFile(null);
-            setImageURL(null);
-          },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              setImageURL(downloadURL);
-            });
+  const uploadImage = async () => {
+    setImageFileError(null);
+    const storage = getStorage(app);
+
+    if (imageFile !== null) {
+      const fileName = new Date().getTime() + imageFile.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, imageFile as Blob);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setImageFileProgress(Number(progress.toFixed(0)));
+        },
+        (error) => {
+          setImageFileError("Could not upload Image (File size too large)");
+          setImageFileProgress(null);
+          setImageFile(null);
+          setImageURL(null);
+          console.error("Upload error:", error);
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setImageURL(downloadURL);
+            console.log(downloadURL);
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              profilePic: downloadURL,
+            }));
+          } catch (error) {
+            console.error("Download URL error:", error);
           }
-        );
-      }
-    };
+        }
+      );
+    }
+  };
+
+  useEffect(() => {
     if (imageFile) {
       uploadImage();
     }
   }, [imageFile]);
 
-  const handleUpdateUser = async () => {
-    dispatch(updateUserStart());
-    try {
-      const res = await axios.put(`/users/update-user/${userNow?._id}`, {
-        username,
-        bio,
-      });
-      if (res.data) {
-        dispatch(updateUserSuccess(res.data));
-        toast({
-          title: "Updated successfully",
-          description: `${username} data was updated successfully!`,
-        });
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response && error.response.data && error.response.data.msg) {
-          dispatch(updateUserFailure(error.response.data.msg));
-          toast({ title: "Error", description: error.response.data.msg });
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [e.target.id]: e.target.value,
+    }));
+    console.log(formData);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (Object.keys(formData).length > 0) {
+      dispatch(updateUserStart());
+      try {
+        dispatch(updateUserStart());
+        const res = await axios.put(
+          `/users/update-user/${userNow?._id}`,
+          formData
+        );
+        if (res.data) {
+          dispatch(updateUserSuccess(res.data));
+          toast({
+            title: "Updated successfully",
+            description: `Profile was updated successfully!`,
+          });
+        }
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.msg
+          ) {
+            dispatch(updateUserFailure(error.response.data.msg));
+            toast({ title: "Error", description: error.response.data.msg });
+          }
         }
       }
+    } else {
+      toast({ title: "Invalid", description: "No changes were made" });
     }
   };
 
@@ -147,7 +185,7 @@ const Profile = () => {
         dispatch(updateUserSuccess(res.data));
         toast({
           title: "Updated successfully",
-          description: `${username} password was updated successfully!`,
+          description: `Password was updated successfully!`,
         });
         dispatch(signOutSuccess());
         navigate("/login");
@@ -266,99 +304,89 @@ const Profile = () => {
         </TabsList>
         <TabsContent value="account">
           <Card>
-            <CardHeader>
-              <CardTitle>Account</CardTitle>
-              <CardDescription>
-                Make changes to your account here. Click save when you're done.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div
-                className="flex flex-col items-center justify-center gap-4 relative"
-                onClick={() => filePicker.current?.click()}
-              >
-                {imageFileProgress && (
-                  <CircularProgressbar
-                    value={imageFileProgress || 0}
-                    text={`${imageFileProgress}%`}
-                    strokeWidth={5}
-                    styles={{
-                      root: {
-                        width: "100%",
-                        height: "100%",
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                      },
-                      path: {
-                        stroke: `rgba(62, 152, 199, ${
-                          imageFileProgress / 100
-                        })`,
-                      },
-                    }}
-                  />
-                )}
-                <Avatar>
-                  <AvatarImage
-                    src={imageURL || userNow?.profilePic}
-                    alt="Avatar"
-                    className={`w-28 h-28 object-cover rounded-full
-                    border-2 border-primary shadow-md shadow-gray-500
+            <form onSubmit={handleSubmit}>
+              <CardHeader>
+                <CardTitle>Account</CardTitle>
+                <CardDescription>
+                  Make changes to your account here. Click save when you're
+                  done.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div
+                  className="flex flex-col items-center justify-center"
+                  onClick={() => filePicker.current?.click()}
+                >
+                  <div className="w-32 h-32 overflow-hidden rounded-full">
+                    <Avatar>
+                      <AvatarImage
+                        src={imageURL || userNow?.profilePic}
+                        alt="Avatar"
+                        className={`w-full h-full object-cover 
                   ${
                     imageFileProgress && imageFileProgress < 100 && "opacity-60"
                   }`}
+                      />
+                      <AvatarFallback>DD</AvatarFallback>
+                    </Avatar>
+                    {imageFileError && (
+                      <Alert>
+                        <AlertTitle>Upload Error</AlertTitle>
+                        <AlertDescription>{imageFileError}</AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                  <Progress
+                    value={imageFileProgress}
+                    className="w-[100%] mt-4
+                bg-gray-700 opacity-10"
                   />
-                  <AvatarFallback>DD</AvatarFallback>
-                </Avatar>
-                {imageFileError && (
-                  <Alert>
-                    <AlertTitle>Upload Error</AlertTitle>
-                    <AlertDescription>{imageFileError}</AlertDescription>
-                  </Alert>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImage}
-                  ref={filePicker}
-                  className="rounded-lg text-sm border border-gray-700
+                  <input
+                    type="file"
+                    name="image"
+                    id="image"
+                    accept="image/*"
+                    onChange={handleImage}
+                    ref={filePicker}
+                    className="rounded-lg text-sm border border-gray-700
                   w-full"
-                  hidden
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  defaultValue={userNow?.username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" defaultValue={userNow?.email} disabled />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  placeholder="Type your message here."
-                  id="bio"
-                  name="bio"
-                  value={bio}
-                  defaultValue={userNow?.bio}
-                  className="text-gray-700 dark:text-gray-400"
-                  onChange={(e) => setBio(e.target.value)}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Your bio will be shown on your profile.
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={handleUpdateUser}>
-                Save changes
-              </Button>
-            </CardFooter>
+                    hidden
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    name="username"
+                    id="username"
+                    defaultValue={userNow?.username}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" defaultValue={userNow?.email} disabled />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    placeholder="Type your message here."
+                    name="bio"
+                    id="bio"
+                    defaultValue={userNow?.bio}
+                    onChange={handleChange}
+                    className="text-gray-700 dark:text-gray-400"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Your bio will be shown on your profile.
+                  </p>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full" type="submit">
+                  Save changes
+                </Button>
+              </CardFooter>
+            </form>
           </Card>
         </TabsContent>
         <TabsContent value="password">

@@ -76,10 +76,7 @@ export const userSignUp = async (
       clearCookie(res);
       generateTokenCookie(user, res);
       return res.status(201).json({
-        username: user.username,
-        email: user.email,
-        msg: "User created successfully",
-        status: 201,
+        userData: user,
       });
     }
   } catch (error: any) {
@@ -112,11 +109,7 @@ export const userSignIn = async (
     clearCookie(res);
     generateTokenCookie(user, res);
     return res.status(200).json({
-      userId: user._id.toString(),
-      username: user.username,
-      email: user.email,
-      msg: `${email} logged in successfully`,
-      status: 200,
+      userData: user,
     });
   } catch (error: any) {
     errorHandler(error, res);
